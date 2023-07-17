@@ -1,0 +1,68 @@
+REPORT ZSALV_180496.
+
+data it_makt type STANDARD TABLE OF makt. "internal table declared type of makt std table
+
+data v_matnr type makt-matnr. "declaring matnr field type for select option
+SELECT-OPTIONS s_matnr for v_matnr.  "select option for range selecting for matnr(material number)
+
+START-OF-SELECTION. "selection method starts
+PERFORM get_data.  "call the subroutine get_data which will store copy data into internal table
+
+end-of-SELECTION.  "selection statement over - output part begins in next line
+PERFORM display. "call the subroutine for displaying out
+
+
+*&---------------------------------------------------------------------*
+*& Form get_data
+*&---------------------------------------------------------------------*
+*& text
+*&---------------------------------------------------------------------*
+*& -->  p1        text
+*& <--  p2        text
+*&---------------------------------------------------------------------*
+FORM get_data . "subroutine for get data
+select * from makt into table it_makt where matnr in s_matnr. "std table data move into internal table
+ENDFORM.
+
+
+*&---------------------------------------------------------------------*
+*& Form display
+*&---------------------------------------------------------------------*
+*& text
+*&---------------------------------------------------------------------*
+*& -->  p1        text
+*& <--  p2        text
+*&---------------------------------------------------------------------*
+FORM display .   "subroutine for displaying output
+  "for displaying data in tables we use std table view ALV (abap list viewer) - display output like table content
+
+try. "exception catching code we placed in the try catch block.
+ " try - exception may occur code we written
+  "  catch - exception handling code we written like message.
+
+  cl_salv_table=>factory(   "std class for alv table (cl_salv_table) and factory is the static method.
+" in this case the class is private - instance generator (only one object can create by the std class but outside class have no access
+"  to create any object , object creation is restricted.
+
+*    EXPORTING
+*      list_display   = if_salv_c_bool_sap=>false " ALV Displayed in List Mode
+*      r_container    =                           " Abstract Container for GUI Controls
+*      container_name =
+
+    IMPORTING
+      r_salv_table   =     data(o_alv)    "declared object inline o_alv by using key word 'DATA(o_alv)'                  " Basis Class Simple ALV Tables
+ " std import attribute r_salv_table will assign by the object o_alv
+ " importing the data from the internal table of ours then only we can display the data.
+
+    CHANGING
+      t_table        =    it_makt "  This our internal table
+  ).
+
+  CATCH cx_salv_msg. " ALV: General Error Class with Message
+   endtry. "ending the try catch block.
+
+o_alv->display( ). "for printing the table
+
+ENDFORM.
+
+
