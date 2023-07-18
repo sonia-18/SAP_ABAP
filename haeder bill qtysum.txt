@@ -1,0 +1,129 @@
+*&---------------------------------------------------------------------*
+*& Report ZHEZDER_BILL_QTYSUM_180496
+*&---------------------------------------------------------------------*
+*&
+*&---------------------------------------------------------------------*
+REPORT ZHEZDER_BILL_QTYSUM_180496.
+
+DATA v_vbeln TYPE zvbrk_1-vbeln.
+SELECT-OPTIONS s_VBELN FOR v_vbeln.
+
+TYPES : BEGIN OF ty_kna1,
+          name1 TYPE kna1-name1,
+          kunnr TYPE kna1-kunnr,
+        END OF ty_kna1.
+
+
+TYPES : BEGIN OF ty_vbrk,
+          vbeln TYPE zvbrk_1-vbeln,
+          fkdat TYPE zvbrk_1-fkdat,
+          kunrg TYPE  zvbrk_1-kunrg,
+          netwr TYPE zvbrk_1-netwr,
+        END OF ty_vbrk.
+
+
+
+TYPES : BEGIN OF ty_vbrp,
+          vbeln TYPE zvbrp_1-vbeln,
+          posnr TYPE  zvbrp_1-posnr,
+          matnr TYPE  zvbrp_1-matnr,
+          fkimg TYPE zvbrp_1-fkimg,
+          vrkme TYPE  zvbrp_1-vrkme,
+          netwr TYPE  zvbrp_1-netwr,
+        END OF ty_vbrp.
+
+
+
+TYPES : BEGIN OF ty_t006a,
+          msehi TYPE t006a-msehi,
+          mseht TYPE t006a-mseht,
+        END OF ty_t006a.
+
+
+
+
+DATA : it_vbrk TYPE TABLE OF ty_vbrk,
+       wa_vbrk LIKE LINE OF it_vbrk,
+       it_vbrp TYPE TABLE OF ty_vbrp,
+       wa_vbrp LIKE LINE OF it_vbrp,
+       it_t006a TYPE TABLE OF ty_t006a,
+       wa_t006a LIKE LINE OF it_t006a,
+       it_kna1  TYPE TABLE OF ty_kna1,
+       wa_kna1  LIKE LINE OF it_kna1.
+
+
+
+
+IF s_vbeln IS NOT INITIAL.
+  SELECT  vbeln fkdat kunrg netwr FROM zvbrk_1 INTO TABLE it_vbrk WHERE vbeln IN s_vbeln.
+ENDIF.
+
+
+
+IF it_vbrk IS NOT INITIAL.
+  SELECT vbeln
+       posnr
+       matnr
+       fkimg
+       vrkme
+       netwr FROM zvbrp_1 INTO TABLE  it_vbrp FOR ALL ENTRIES IN it_vbrk WHERE vbeln EQ it_vbrk-vbeln.
+
+
+
+  SELECT name1 FROM kna1 INTO TABLE it_t006a FOR ALL ENTRIES IN it_vbrk WHERE kunnr EQ it_vbrk-kunrg.
+  IF it_vbrp IS NOT INITIAL.
+    SELECT msehi mseht FROM t006a INTO TABLE it_t006a FOR ALL ENTRIES IN it_vbrp WHERE spras EQ sy-langu AND msehi EQ it_vbrp-vrkme.
+  ENDIF.
+ENDIF.
+
+
+
+
+SORT IT_VBRP BY VBELN.
+DATA v_vbeln_temp like wa_vbrp-vbeln.
+
+
+
+LOOP AT it_vbrp INTO wa_vbrp.
+  READ TABLE it_vbrk INTO wa_vbrk WITH KEY vbeln = wa_vbrp-vbeln.
+  READ TABLE it_kna1 INTO wa_kna1 WITH KEY kunnr = wa_vbrk-kunrg.
+  READ TABLE it_t006a INTO wa_t006a  WITH KEY msehi = wa_vbrp-vrkme.
+
+IF v_vbeln_temp NE WA_VBRP-VBELN.
+
+  WRITE : /'DOCUMENT NO :', wa_vbrk-vbeln,
+         /'Payer :', wa_kna1-name1,
+         /'Date :', wa_vbrk-fkdat,
+         /'Net Value :', wa_vbrk-netwr LEFT-JUSTIFIED.
+
+ WRITE : / 'item',
+         40 'Material',
+         75 'Quantity',
+         90 'Abbreviation',
+         120 'Net Value'.
+
+
+ENDIF.
+
+  WRITE : / wa_vbrp-posnr,
+      40 wa_vbrp-matnr,
+      75 wa_vbrp-fkimg LEFT-JUSTIFIED,
+      90 wa_t006a-mseht,
+      120 wa_vbrp-netwr LEFT-JUSTIFIED.
+
+  v_vbeln_temp = wa_vbrp-vbeln.
+
+  data v_sum_qty type I.
+
+  if wa_vbrp-fkimg ne 0 and wa_vbrk-vbeln eq v_vbeln_temp.
+*    v_sum_qty = 0.
+  v_sum_qty = v_sum_qty + wa_vbrp-fkimg.
+
+
+*if wa_vbrk-vbeln eq v_vbeln_temp and v_sum_qty ne 0 and .
+write : / 'Total qty',v_sum_qty.
+*endif.
+endif.
+
+
+ENDLOOP.
