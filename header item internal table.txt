@@ -1,0 +1,119 @@
+*&---------------------------------------------------------------------*
+*& Report ZHEADER_ITEM_180496
+*&---------------------------------------------------------------------*
+*&
+*&---------------------------------------------------------------------*
+REPORT zheader_item_internal_t_180496.
+
+PARAMETERS p_vbeln TYPE vbeln.
+
+TYPES :BEGIN OF ty_vbrk,
+         vbeln TYPE vbeln,
+         kunrg TYPE kunrg,
+         fkdat TYPE fkdat,
+         netwr TYPE netwr,
+       END OF ty_vbrk.
+
+TYPES : BEGIN OF ty_vbrp,
+          vbeln type vbeln,
+          posnr TYPE posnr, "item
+          matnr TYPE matnr, "material
+          fkimg TYPE fkimg, "quantity
+          vrkme TYPE vrkme, "measure
+          netwr TYPE netwr, "net value
+        END OF ty_vbrp.
+
+*DATA st_vbrk TYPE ty_vbrk.
+*DATA st_vbrp TYPE ty_vbrp.
+*DATA v_name1 TYPE kna1-name1.
+*DATA v_mseht TYPE t006a-mseht.
+
+data : it_zvbrk type table of ty_vbrk,
+       wa_zvbrk like line of it_zvbrk,
+       it_zvbrp type table of ty_vbrp,
+       wa_zvbrp like line of it_zvbrp,
+       v_name1 type kna1-name1.
+
+*select vbeln kunrg fkdat netwr from zvbrk_1 into wa_zvbrk.
+
+types : begin of ty_t006a,
+       msehi type msehi,
+       mseht type mseht,
+      end of ty_t006a.
+
+data : it_t006a type table of ty_t006a,
+       wa_t006a like line of it_t006a.
+
+*  append wa_zvbrk to it_zvbrk.
+*endselect.
+*write 'end'.
+
+select vbeln kunrg fkdat netwr from zvbrk_1 into table it_zvbrk. "original table to internal table.actually we not need internal table here we can
+
+  read table it_zvbrk into wa_zvbrk with key vbeln = p_vbeln.
+  select single name1 from kna1 into v_name1 where kunnr eq wa_zvbrk-kunrg.
+
+
+  write : / 'Document Num : ',wa_zvbrk-vbeln,
+         /,
+         /'payer num : ',wa_zvbrk-kunrg,
+         /,
+         /'payer name : ',v_name1,
+         /,
+         /'Date : ',wa_zvbrk-fkdat,
+         /,
+         /'Net Value : ',wa_zvbrk-netwr left-JUSTIFIED,
+         /.
+
+SELECT vbeln posnr matnr fkimg vrkme netwr from zvbrp_1 into table it_zvbrp.
+
+  WRITE :/'item',
+20 'material',
+40 'Qty',
+60 'UOM',
+70 'Abbr',
+80 'netvalue'.
+
+select msehi mseht from t006a into table it_t006a where spras eq sy-langu. "and msehi eq wa_zvbrp-vrkme'.
+  loop at it_zvbrp into wa_zvbrp where vbeln eq p_vbeln.
+    read table it_t006a into wa_t006a with key msehi = wa_zvbrp-vrkme.
+    WRITE : / wa_zvbrp-posnr,
+     20 wa_zvbrp-matnr,
+     30 wa_zvbrp-fkimg,
+     60 wa_zvbrp-vrkme,
+     70 wa_t006a-mseht,
+     77 wa_zvbrp-netwr.
+   endloop.
+
+*
+*SELECT SINGLE vbeln kunrg fkdat netwr FROM zvbrk_1 INTO st_vbrk WHERE vbeln EQ p_vbeln.
+*SELECT SINGLE name1 FROM kna1 INTO v_name1 WHERE kunnr EQ st_vbrk-kunrg.
+*
+*WRITE :/'Doc.No : ',st_vbrk-vbeln,
+*/,
+**         /'Payer : ',st_vbrk-kunrg,
+*/'payer Name : ',v_name1,
+* /,
+* /'Date : ',st_vbrk-fkdat,
+* /,
+* /'Netvalue : ',st_vbrk-netwr LEFT-JUSTIFIED.
+*WRITE /.
+*WRITE :/'item',
+*20 'material',
+*40 'Qty',
+*60 'UOM',
+*70 'Abbr',
+*80 'netvalue'.
+*
+*WRITE /.
+*
+*SELECT posnr matnr fkimg vrkme netwr FROM zvbrp_1 INTO st_vbrp WHERE vbeln EQ p_vbeln.
+*  SELECT SINGLE mseht FROM t006a INTO v_mseht WHERE spras EQ sy-langu AND msehi EQ st_vbrp-vrkme.
+*
+*  WRITE :/ st_vbrp-posnr,
+*         20 st_vbrp-matnr,
+*         30 st_vbrp-fkimg,
+*         60 st_vbrp-vrkme,
+*         65 v_mseht,
+*         70 st_vbrp-netwr.
+*ENDSELECT.
