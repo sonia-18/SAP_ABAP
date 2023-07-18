@@ -1,0 +1,80 @@
+*&---------------------------------------------------------------------*
+*& Report ZPLANT_REPORT_180496
+*&---------------------------------------------------------------------*
+*&
+*&---------------------------------------------------------------------*
+REPORT ZPLANT_REPORT_ITABLE_180496.
+
+*&input field mentioned as parameter
+
+
+  parameters p_werks type mard-werks.
+
+  types : begin of ty_mard,
+          matnr type mard-matnr,
+          werks type mard-werks,
+          lgort type mard-lgort,
+          "maktx type maktx,
+          "name1 type name1,
+          end of ty_mard.
+
+   types : begin of ty_makt,
+          matnr type makt-matnr,
+          maktx type makt-maktx,
+          end of ty_makt.
+
+   types : begin of ty_t001w,
+           name1 type t001w-name1,
+           end of ty_t001w.
+
+
+
+* types :begin of ty_makt,
+*         maktx type makt-maktx,
+*         end of ty_makt.
+*
+*        data st_mard type ty_mard.
+*        data v_maktx type makt-maktx.
+*        data v_name1 type t001w-name1.
+**        data st_makt type ty_makt.
+
+data : it_mard type table of  ty_mard,
+       wa_mard like line of it_mard,
+       it_makt type table of ty_makt,
+       wa_makt like line of it_makt,
+       it_t001w type table of ty_t001w,
+       wa_t001w like line of it_t001w.
+
+
+ select matnr werks lgort from mard INTO table it_mard where werks eq p_werks.
+   select matnr maktx from makt into table it_makt where matnr eq wa_makt-matnr.
+     
+
+
+   write : /'plant',
+     20 'plant name',
+     30  'storage location',
+     45 'material description'.
+
+
+
+
+*select werks lgort matnr from mard into st_mard where werks eq p_werks.
+*  select single maktx from makt into st_makt where spras eq sy-langu.
+*  write : / 'plant','storage location','material','Material Description'.
+*  write : / st_mard-werks,st_mard-lgort,st_mard-matnr,st_makt-maktx.
+* ENDSELECT.
+
+*  write : / 'plant',
+*  20 'Plant Name','storage location',
+*  'material',
+*  45'Material Description'.
+*
+*select werks lgort matnr from mard into st_mard where werks eq p_werks.
+*  select single maktx from makt into v_maktx where matnr eq st_mard-matnr and spras eq sy-langu.
+*  select single name1 from t001w into v_name1 where werks eq p_werks.
+*
+*  write : / st_mard-werks,
+*  20 v_name1,st_mard-lgort,st_mard-matnr,
+*  45 v_maktx.
+* ENDSELECT.
