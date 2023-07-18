@@ -1,0 +1,42 @@
+*&---------------------------------------------------------------------*
+*& Report ZINTERNAL_TABLE_180496
+*&---------------------------------------------------------------------*
+*&
+*&---------------------------------------------------------------------*
+REPORT ZINTERNAL_TABLE_180496.
+
+types : begin of ty_makt,
+        matnr type matnr,
+        spras type spras,
+        maktx type maktx,
+        end of ty_makt.
+
+data : it_makt type table of ty_makt,
+        wa_makt like line of it_makt.
+
+  wa_makt-matnr = '100'.
+  wa_makt-spras = 'E'.
+  wa_makt-maktx = 'laptop'.
+  APPEND wa_makt TO it_makt.
+
+  wa_makt-matnr = '200'.
+  wa_makt-spras = 'D'.
+  wa_makt-maktx = 'mobile'.
+  append wa_makt to it_makt.
+
+  wa_makt-matnr = '200'.
+  wa_makt-spras = 'E'.
+  wa_makt-maktx = 'charger'.
+  append wa_makt to it_makt.
+
+  wa_makt-matnr = '300'.
+  wa_makt-spras = 'D'.
+  wa_makt-maktx = 'USB'.
+  append wa_makt to it_makt.
+
+  read table it_makt into wa_makt index 3.
+  read table it_makt into wa_makt with key = '200'.
+
+  loop at it_makt into wa_makt where matnr eq '200'.
+    write wa_makt.
+    endloop.
