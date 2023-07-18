@@ -1,0 +1,23 @@
+*&---------------------------------------------------------------------*
+*& Report ZCUSTOMER_DATA_180496
+*&---------------------------------------------------------------------*
+*&
+*&---------------------------------------------------------------------*
+REPORT ZCUSTOMER_DATA_180496.
+
+data v_kunnr type kunnr.
+select-OPTIONS s_kunnr for v_kunnr.
+
+data : it_cdata type zson_t_cust,
+      wa_cdata like LINE OF it_cdata.
+
+CALL FUNCTION 'ZCUSTOMER_FM_180496'
+  EXPORTING
+    im_kunnr          = s_kunnr[]
+ IMPORTING
+   EX_DATA       = it_cdata
+          .
+CALL FUNCTION 'ZCUST_PRINT_FM_180496'
+  EXPORTING
+    im_print       =  IT_CDATA
+          .
