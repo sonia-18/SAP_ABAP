@@ -1,0 +1,54 @@
+*&---------------------------------------------------------------------*
+*& Report ZCLASS_GETSET_CON_180496
+*&---------------------------------------------------------------------*
+*&
+*&---------------------------------------------------------------------*
+REPORT ZCLASS_GETSET_CON_180496.
+
+CLASS cl_private DEFINITION.
+
+   public SECTION.
+  METHODS set_count IMPORTING im_count type i.
+  METHODS GET_COUNT EXPORTING EX_COUNT TYPE I.
+  data result type i.
+
+
+  PRIVATE SECTION.
+  data count type i.
+
+
+*  class-data s_count type i.
+
+
+
+  endclass.
+
+  CLASS CL_PRIVATE IMPLEMENTATION.
+
+    METHOD SET_COUNT.
+      result = im_count.
+    ENDMETHOD.
+
+
+    METHOD GET_COUNT.
+      ex_count = result.
+      ENDMETHOD.
+
+    ENDCLASS.
+
+  DATA OB_COUNT TYPE REF TO CL_PRIVATE.
+
+  START-OF-SELECTION.
+  CREATE OBJECT OB_COUNT.
+
+ OB_COUNT->set_count(
+EXPORTING
+   im_count = 10
+   ).
+
+    ob_count->get_count(
+      IMPORTING
+        ex_count = count
+    ).
+
+     write count.
