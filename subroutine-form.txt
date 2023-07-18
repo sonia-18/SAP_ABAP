@@ -1,0 +1,69 @@
+*&---------------------------------------------------------------------*
+*& Report ZBILLING_CLASSWRK_180496
+*&---------------------------------------------------------------------*
+*&
+*&---------------------------------------------------------------------*
+REPORT zbilling_form_subr_180496.
+
+** ty_makt line type (structure) and ty_t_makt table type (internal table)
+*types : ty_t_vbrk TYPE STANDARD TABLE OF zvbrk_1,
+**        st_vbrk type ty_t_vbrk.
+*         ty_t_vbrp TYPE STANDARD TABLE OF zvbrp_1.
+**step 1
+*DATA : it_vbrk type ty_t_vbrk,
+*       wa_vbrk LIKE LINE OF it_vbrk,
+*       it_vbrp TYPE ty_t_vbrp,
+*       wa_vbrp LIKE LINE OF it_vbrp.
+*
+** declaring data type for payer name and abbr / internal table
+*    types : begin of ty_t006a,
+*             msehi type t006-msehi,
+*             mseht type t006a-mseht,
+*             end of ty_t006a.
+*
+*   types : begin of ty_kna1,
+*           kunnr type kna1-kunnr,
+*           name1 type kna1-name1,
+*           end of ty_kna1.
+*
+*types : ty_t_t006a type table of ty_t006a,
+*        ty_t_kna1 type table of  ty_kna1.
+*
+* data : it_t006a type ty_t_t006a,
+*        wa_t006a like line of it_t006a,
+*        it_kna1 type  ty_t_kna1,
+*        wa_kna1 like line of it_kna1.
+*
+**step 2
+**SELECT-OPTIONS s_vbeln FOR wa_vbrk-vbeln.
+**parameters p_vbeln type vbeln.
+*
+*
+*types : begin of ty_k,
+*         vbeln type vbeln,
+*       end of ty_k.
+*
+* types  ty_t_k type table of  ty_k.
+* data s_vbeln type ty_t_k.
+*
+*
+*form billing using s_vbeln type ty_t_k
+*            changing it_vbrk type ty_t_vbrk
+*                     it_vbrp type ty_t_vbrp
+*                     it_t006a type ty_t_t006a
+*                     it_kna1 type ty_t_kna1.
+*  select * from zvbrk_1 into table  it_vbrk.
+*  select * from zvbrp_1 into table  it_vbrp.
+*  select msehi mseht from t006a into table it_t006a for ALL ENTRIES IN it_vbrp where msehi eq it_vbrp-vrkme.
+*  select kunnr name1 from kna1 into table it_kna1 for ALL ENTRIES IN it_vbrk where kunnr eq it_vbrk-kunrg.
+*  endform.
+
+*data r_vbeln type table of zheader_bill.
+
+form get_header using r_vbeln type zheader_t_bill changing p_it_header.
+   data : lt_header type table of zheader_bill,
+           lw_header  like line of lt_header.
+   select * from zvbrk_1 into table lt_header.
+
+
+endform.
