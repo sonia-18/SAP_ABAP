@@ -1,0 +1,48 @@
+
+*&---------------------------------------------------------------------*
+*& Report ZBILIING_FM_180496
+*&---------------------------------------------------------------------*
+*&
+*&---------------------------------------------------------------------*
+REPORT ZBILIING_FM_180496.
+
+data  v_vbeln type  vbeln.
+select-options s_vbeln for v_vbeln.
+
+data it_header type  zheader_t_bill.
+data wa_header like line of it_header.
+
+data it_item type zitem_t_bill.
+data wa_item like line of it_item.
+
+
+
+CALL FUNCTION 'ZFUN_MOD_180496'
+  EXPORTING
+    im_vbeln        = s_vbeln[]
+ IMPORTING
+   EX_HEADER       =  it_header
+   EX_ITEM         =  it_item
+          .
+
+loop at it_item into wa_item.
+  read table it_header into wa_header with key vbeln = wa_item-vbeln.
+  at new vbeln.
+    write : / 'Doc no.',wa_header-vbeln,
+            / 'payer name', wa_header-name1,
+            / 'Date' ,wa_header-fkdat,
+            /'Net vlaue', wa_header-netwr.
+        write : / 'item',
+                 20 'material no.',
+                  30 'Qty',
+                  50 'measure',
+                  70 'abrr',
+                  80 'netvalue'.
+    endat.
+    write : / wa_item-posnr,
+            20 wa_item-matnr,
+            30 wa_item-fkimg,
+            50 wa_item-vrkme,
+            70 wa_item-mseht,
+            80 wa_item-netwr.
+    endloop.
