@@ -1,0 +1,23 @@
+*&---------------------------------------------------------------------*
+*& Report ZDEMO_FIRST_PRGM_180496
+*&---------------------------------------------------------------------*
+*&
+*&---------------------------------------------------------------------*
+REPORT ZDEMO_FIRST_PRGM_180496.
+
+
+
+**structure
+
+DATA : BEGIN OF st_makt,
+       matnr type makt-matnr,
+       spras type makt-spras,
+       maktx type makt-maktx,
+  end of st_makt.
+  st_makt-matnr = '100'.
+  st_makt-spras = '6'.
+  st_makt-maktx = '40'.
+  write st_makt.
+
+  st_makt-matnr = '30'.
+  write st_makt.
