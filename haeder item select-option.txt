@@ -1,0 +1,157 @@
+*&---------------------------------------------------------------------*
+*& Report ZHEADER_ITEM_SELECT_180496
+*&---------------------------------------------------------------------*
+*&
+*&---------------------------------------------------------------------*
+REPORT zheader_item_select_180496.
+
+DATA v_vbeln TYPE vbeln.
+SELECT-OPTIONS s_vbeln FOR v_vbeln.
+
+TYPES : BEGIN OF ty_itvbrk,
+          vbeln TYPE vbeln,
+          kunrg TYPE kunrg,
+          fkdat TYPE fkdat,
+          netwr TYPE netwr,
+        END OF ty_itvbrk.
+
+TYPES: BEGIN OF ty_itvbrp,
+         vbeln TYPE vbeln,
+         posnr TYPE posnr,
+         matnr TYPE matnr,
+         fkimg TYPE fkimg,
+         vrkme TYPE vrkme,
+         netwr TYPE netwr,
+       END OF ty_itvbrp.
+
+
+TYPES : BEGIN OF ty_t006a,
+          msehi TYPE msehi,
+          mseht TYPE mseht,
+        END OF ty_t006a.
+
+TYPES : BEGIN OF ty_kna1,
+          name1 TYPE name1,
+          kunnr TYPE kunnr,
+        END OF ty_kna1.
+
+DATA : it_vbrk  TYPE TABLE OF  ty_itvbrk,
+       wa_vbrk  LIKE LINE OF it_vbrk,
+       it_vbrp  TYPE TABLE OF  ty_itvbrp,
+       wa_vbrp  LIKE LINE OF it_vbrp,
+       it_t006a TYPE TABLE OF  ty_t006a,
+       wa_t006a LIKE LINE OF it_t006a,
+       it_kna1  TYPE TABLE OF ty_kna1,
+       wa_kna1  LIKE LINE OF it_kna1.
+
+
+*if it_vbrk is not initial.
+
+  SELECT vbeln kunrg fkdat netwr FROM zvbrk_1 INTO TABLE it_vbrk  WHERE vbeln IN s_vbeln[].
+
+    SELECT vbeln posnr matnr fkimg vrkme netwr FROM zvbrp_1 INTO TABLE it_vbrp WHERE vbeln IN s_vbeln[].
+
+    SELECT kunnr name1 FROM kna1 INTO TABLE it_kna1.
+
+    SELECT msehi mseht FROM t006a INTO TABLE it_t006a WHERE spras EQ sy-langu .
+
+     sort it_vbrp by vbeln.
+
+
+    LOOP AT it_vbrp INTO wa_vbrp.
+      READ TABLE  it_vbrk INTO wa_vbrk WITH KEY vbeln = wa_vbrk-vbeln.
+      READ TABLE it_kna1 INTO wa_kna1 WITH KEY kunnr = wa_vbrk-kunrg .
+      READ TABLE it_t006a INTO wa_t006a WITH KEY msehi = wa_vbrp-vrkme.
+data v_temp_vbeln like wa_vbrk-vbeln.
+
+if  wa_vbrk-vbeln ne v_temp_vbeln.
+      WRITE : / 'Document Num : ',wa_vbrk-vbeln,
+             /,
+             /'payer num : ',wa_vbrk-kunrg,
+             /,
+             /'payer name : ',wa_kna1-name1,
+             /,
+             /'Date : ',wa_vbrk-fkdat,
+             /,
+             /'Net Value : ',wa_vbrk-netwr LEFT-JUSTIFIED,
+             /.
+
+      WRITE :/'item',
+    20 'material',
+    40 'Qty',
+    60 'UOM',
+    70 'Abbr',
+    80 'netvalue'.
+
+endif.
+
+      WRITE : / wa_vbrp-posnr,
+   20 wa_vbrp-matnr,
+   30 wa_vbrp-fkimg,
+   60 wa_vbrp-vrkme,
+   70 wa_t006a-mseht,
+   77 wa_vbrp-netwr.
+
+     v_temp_vbeln = wa_vbrk-vbeln.
+
+    ENDLOOP.
+
+*
+*
+**
+*
+*
+
+
+*SELECT vbeln posnr matnr fkimg vrkme netwr from zvbrp_1 into table it_vbrp.
+*  select msehi mseht from t006a into table it_t006a where spras eq sy-langu.
+*  loop at it_vbrp into wa_vbrp where vbeln = v_vbeln.
+*    read table it_t006a into wa_t006a with key msehi = wa_vbrp-vrkme.
+*
+*        WRITE : / wa_vbrp-posnr,
+*     20 wa_vbrp-matnr,
+*     30 wa_vbrp-fkimg,
+*     60 wa_vbrp-vrkme,
+*     70 wa_t006a-mseht,
+*     77 wa_vbrp-netwr.
+*   endloop.
+
+
+
+*   read table it_vbrk into wa_vbrk with key vbeln = p_vbeln.
+*  select single name1 from kna1 into v_name1 where kunnr eq wa_vbrk-kunrg.
+*
+**SELECT vbeln posnr matnr fkimg vrkme netwr FROM zvbrp_1 INTO TABLE it_vbrp.
+*
+*select msehi mseht from t006a into table it_t006a.
+*
+*  write : / 'Document Num : ',wa_vbrk-vbeln,
+*         /,
+*         /'payer num : ',wa_vbrk-kunrg,
+*         /,
+*         /'payer name : ',v_name1,
+*         /,
+*         /'Date : ',wa_vbrk-fkdat,
+*         /,
+*         /'Net Value : ',wa_vbrk-netwr left-JUSTIFIED,
+*         /.
+*
+*SELECT vbeln posnr matnr fkimg vrkme netwr from zvbrp_1 into table it_vbrp.
+*
+*  WRITE :/'item',
+*20 'material',
+*40 'Qty',
+*60 'UOM',
+*70 'Abbr',
+*80 'netvalue'.
+*
+*select msehi mseht from t006a into table it_t006a where spras eq sy-langu. "and msehi eq wa_zvbrp-vrkme'.
+*  loop at it_vbrp into wa_vbrp where vbeln eq p_vbeln.
+*    read table it_t006a into wa_t006a with key msehi = wa_vbrp-vrkme.
+*    WRITE : / wa_vbrp-posnr,
+*     20 wa_vbrp-matnr,
+*     30 wa_vbrp-fkimg,
+*     60 wa_vbrp-vrkme,
+*     70 wa_t006a-mseht,
+*     77 wa_vbrp-netwr.
+*   endloop.
