@@ -1,0 +1,26 @@
+*&---------------------------------------------------------------------*
+*& Report ZINHERITANCE_180496
+*&---------------------------------------------------------------------*
+*&
+*&---------------------------------------------------------------------*
+REPORT ZINHERITANCE_180496.
+
+data o_sup type ref to zcl_super_son.
+data o_sub type ref to zcl_sub_son.
+
+create object o_sup.
+create object o_sub.
+
+o_sup->next_num(
+
+  IMPORTING
+    ex_num =  DATA(num)            " exporting next number to main code
+).
+
+o_sub->next_num(
+  IMPORTING
+    ex_num =   Data(num1)          " exporting next number to main code
+).
+  write num.
+  write num1.
+  write 'end'.
