@@ -1,0 +1,76 @@
+*&---------------------------------------------------------------------*
+*& Report ZPLANTREPORT_SELECT_IT_180496
+*&---------------------------------------------------------------------*
+*&
+*&---------------------------------------------------------------------*
+REPORT ZPLANTREPORT_SELECT_IT_180496.
+
+data v_werks type mard-werks.
+SELECT-OPTIONS s_werks for v_werks.
+
+
+TYPES : BEGIN OF ty_mard,
+         matnr TYPE mard-matnr,
+         werks TYPE mard-werks,
+         lgort TYPE mard-lgort,
+          END OF ty_mard.
+
+TYPES : BEGIN OF ty_makt,
+          matnr TYPE makt-matnr,
+          maktx TYPE makt-maktx,
+        END OF ty_makt.
+
+TYPES : BEGIN OF ty_t001w,
+        name1 TYPE t001w-name1,
+        END OF ty_t001w.
+
+DATA : it_mard  TYPE TABLE OF ty_mard,
+       wa_mard  LIKE LINE OF it_mard,
+       it_makt  TYPE TABLE OF ty_makt,
+       wa_makt  LIKE LINE OF it_makt,
+       it_t001w TYPE TABLE OF ty_t001w,
+       wa_t001w LIKE LINE OF it_t001w.
+
+
+
+SELECT matnr werks lgort FROM mard INTO TABLE it_mard WHERE werks in s_werks.
+IF it_mard IS NOT INITIAL.
+  SELECT matnr maktx FROM makt INTO TABLE it_makt FOR ALL ENTRIES IN it_mard WHERE matnr EQ it_mard-matnr AND spras EQ sy-langu.
+ENDIF.
+
+
+
+WRITE : /'Material number',
+
+
+
+        45 'plant',
+
+
+
+        60 'storage location',
+
+
+
+        90 'short description',
+
+
+
+
+        120 'name1'.
+LOOP AT it_mard INTO wa_mard.
+  READ TABLE it_makt INTO wa_makt WITH KEY matnr = wa_mard-matnr.
+  WRITE : / wa_mard-matnr,
+
+
+
+          45    wa_makt-maktx,
+          60 wa_mard-werks,
+           80   wa_t001w-name1,
+          120 wa_mard-lgort.
+
+
+
+
+
+ENDLOOP.
