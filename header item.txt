@@ -1,0 +1,60 @@
+*&---------------------------------------------------------------------*
+*& Report ZHEADER_ITEM_180496
+*&---------------------------------------------------------------------*
+*&
+*&---------------------------------------------------------------------*
+REPORT zheader_item_180496.
+
+PARAMETERS p_vbeln TYPE vbeln.
+
+TYPES :BEGIN OF ty_vbrk,
+         vbeln TYPE zvbrk_1-vbeln,
+         kunrg TYPE zvbrk_1-kunrg,
+         fkdat TYPE zvbrk_1-fkdat,
+         netwr TYPE zvbrk_1-netwr,
+       END OF ty_vbrk.
+
+TYPES : BEGIN OF ty_vbrp,
+          posnr TYPE zvbrp_1-posnr, "item
+          matnr TYPE zvbrp_1-matnr, "material
+          fkimg TYPE zvbrp_1-fkimg, "quantity
+          vrkme TYPE zvbrp_1-vrkme, "measure
+          netwr TYPE zvbrp_1-netwr, "net value
+        END OF ty_vbrp.
+
+DATA st_vbrk TYPE ty_vbrk.
+DATA st_vbrp TYPE ty_vbrp.
+DATA v_name1 TYPE kna1-name1.
+DATA v_mseht TYPE t006a-mseht.
+
+SELECT SINGLE vbeln kunrg fkdat netwr FROM zvbrk_1 INTO st_vbrk WHERE vbeln EQ p_vbeln.
+SELECT SINGLE name1 FROM kna1 INTO v_name1 WHERE kunnr EQ st_vbrk-kunrg.
+
+WRITE :/'Doc.No : ',st_vbrk-vbeln,
+/,
+*         /'Payer : ',st_vbrk-kunrg,
+/'payer Name : ',v_name1,
+ /,
+ /'Date : ',st_vbrk-fkdat,
+ /,
+ /'Netvalue : ',st_vbrk-netwr LEFT-JUSTIFIED.
+WRITE /.
+WRITE :/'item',
+20 'material',
+40 'Qty',
+60 'UOM',
+70 'Abbr',
+80 'netvalue'.
+
+WRITE /.
+
+SELECT posnr matnr fkimg vrkme netwr FROM zvbrp_1 INTO st_vbrp WHERE vbeln EQ p_vbeln.
+  SELECT SINGLE mseht FROM t006a INTO v_mseht WHERE spras EQ sy-langu AND msehi EQ st_vbrp-vrkme.
+
+  WRITE :/ st_vbrp-posnr,
+         20 st_vbrp-matnr,
+         30 st_vbrp-fkimg,
+         60 st_vbrp-vrkme,
+         65 v_mseht,
+         70 st_vbrp-netwr.
+ENDSELECT.
