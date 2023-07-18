@@ -1,0 +1,61 @@
+*&---------------------------------------------------------------------*
+*& Report ZDEV_REPORT_180496
+*&---------------------------------------------------------------------*
+*&
+*&---------------------------------------------------------------------*
+REPORT ZDEV_REPORT_180496.
+
+PARAMETERS p_matnr TYPE makt-matnr.
+
+
+
+TYPES : BEGIN OF ty_makt,
+  matnr TYPE makt-matnr,
+  spras TYPE makt-spras,
+  maktx TYPE makt-maktx,
+  END OF ty_makt.
+
+
+
+  DATA st_makt TYPE ty_makt.
+
+
+
+  WRITE : /'Material',
+          45 'Language',
+          60 'Description'.
+  SELECT matnr spras maktx FROM makt INTO st_makt WHERE matnr EQ p_matnr.
+
+
+
+    WRITE : / st_makt-matnr,
+            45 st_makt-spras,
+            60 st_makt-maktx.
+    ENDSELECT.
+
+    parameters p_matnr type makt-matnr.
+
+
+
+*& parameter p_mat type c length 40.
+*& using single
+
+
+types : begin of ty_makt,
+        matnr type makt-matnr,
+        spras type makt-spras,
+        maktx type makt-maktx,
+        end of ty_makt.
+
+
+
+  data st_makt type ty_makt.
+
+
+
+  select single matnr spras maktx from makt into st_makt where matnr eq p_matnr and spras eq 'E'.
+
+
+
+   write :/'Material','language','Description'.
+   write : / st_makt-matnr,st_makt-spras,st_makt-maktx.
