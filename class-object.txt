@@ -1,0 +1,76 @@
+*&---------------------------------------------------------------------*
+*& Report ZCLASS_OBJ_180496
+*&---------------------------------------------------------------------*
+*&
+*&---------------------------------------------------------------------*
+REPORT ZCLASS_OBJ_180496.
+
+class cl_count DEFINITION.
+
+  PUBLIC SECTION.
+
+
+ methods m_count EXPORTING  count type i.
+
+  endclass.
+
+
+  class cl_count IMPLEMENTATION.
+
+    method m_count.
+     count = count + 1.
+
+      endmethod.
+
+    endclass.
+
+
+    data v_count type i.
+    data  v_tag type i.
+
+     "object creation
+   data ob_count type ref to cl_count. "declaration bject 1
+    data ob_tag type ref to cl_count.
+
+
+    START-OF-SELECTION.
+    create object ob_count.  "instantiate the object 1
+    create object ob_tag.
+
+    ob_count->m_count( "calling method by object
+      IMPORTING
+        count = v_count
+    ).
+
+    ob_tag->m_count(
+      IMPORTING
+        count = v_tag
+    ).
+
+    ob_tag->m_count(
+      IMPORTING
+        count = v_tag
+    ).
+
+    ob_tag->m_count(
+      IMPORTING
+        count = v_tag
+    ).
+
+    ob_tag->m_count(
+      IMPORTING
+        count = v_tag
+    ).
+
+
+     ob_count->m_count( "calling method by object
+      IMPORTING
+        count = v_count
+    ).
+      ob_count->m_count( "calling method by object
+      IMPORTING
+        count = v_count
+    ).
+
+      write : / 'doc num = ',v_count,
+       / 'Tag num = ', v_tag.
