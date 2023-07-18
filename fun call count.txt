@@ -1,0 +1,23 @@
+*&---------------------------------------------------------------------*
+*& Report ZFILE_UPLOAD_180496
+*&---------------------------------------------------------------------*
+*&
+*&---------------------------------------------------------------------*
+REPORT ZFILE_UPLOAD_180496.
+
+data : v_count type i.
+
+CALL FUNCTION 'ZCALL_COUNT_FM_180496'
+ IMPORTING
+   EX_COUNT       = v_count
+          .
+CALL FUNCTION 'ZCALL_COUNT_FM_180496'
+ IMPORTING
+   EX_COUNT       = v_count
+          .
+
+CALL FUNCTION 'ZCALL_COUNT_FM_180496'
+ IMPORTING
+   EX_COUNT       = v_count
+          .
+write v_count.
