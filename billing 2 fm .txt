@@ -1,0 +1,59 @@
+*&---------------------------------------------------------------------*
+*& Report ZBILIING_2_FM_180496
+*&---------------------------------------------------------------------*
+*&
+*&---------------------------------------------------------------------*
+REPORT ZBILIING_2_FM_180496.
+
+data  v_vbeln type  vbeln.
+select-options s_vbeln for v_vbeln.
+
+data it_header type  zheader_t_bill.
+*data wa_header like line of it_header.
+*
+data it_item type zitem_t_bill.
+*data wa_item like line of it_item.
+
+
+START-OF-SELECTION.
+perform get_data.
+
+ end-of-SELECTION.
+   PERFORM get_output.
+
+
+*&---------------------------------------------------------------------*
+*& Form get_data
+*&---------------------------------------------------------------------*
+*& text
+*&---------------------------------------------------------------------*
+*& -->  p1        text
+*& <--  p2        text
+*&---------------------------------------------------------------------*
+FORM get_data .
+
+CALL FUNCTION 'ZFUN_MOD_180496'
+  EXPORTING
+    im_vbeln        = s_vbeln[]
+ IMPORTING
+   EX_HEADER       =  it_header
+   EX_ITEM         =  it_item.
+
+ENDFORM.
+*&---------------------------------------------------------------------*
+*& Form get_output
+*&---------------------------------------------------------------------*
+*& text
+*&---------------------------------------------------------------------*
+*& -->  p1        text
+*& <--  p2        text
+*&---------------------------------------------------------------------*
+FORM get_output .
+
+CALL FUNCTION 'ZFUN_MOD_OUT_180496'
+  EXPORTING
+    im_header       = it_header
+    im_item         =  it_item
+          .
+
+ENDFORM.
