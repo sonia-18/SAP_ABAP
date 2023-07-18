@@ -1,0 +1,73 @@
+*&---------------------------------------------------------------------*
+
+*&---------------------------------------------------------------------*
+*&
+*&---------------------------------------------------------------------*
+REPORT ZHEADER_CURSOR_180496 NO STANDARD PAGE HEADING LINE-COUNT 30(1).
+
+*step 1
+DATA : it_vbrk TYPE STANDARD TABLE OF zvbrk_1,
+       wa_vbrk LIKE LINE OF it_vbrk,
+       it_vbrp TYPE STANDARD TABLE OF zvbrp_1,
+       wa_vbrp LIKE LINE OF it_vbrp.
+
+* declaring data type for payer name and abbr / internal table
+    types : begin of ty_t006a,
+             msehi type t006-msehi,
+             mseht type t006a-mseht,
+             end of ty_t006a.
+
+   types : begin of ty_kna1,
+           kunnr type kna1-kunnr,
+           name1 type kna1-name1,
+           end of ty_kna1.
+
+
+ data : it_t006a type table of ty_t006a,
+        wa_t006a like line of it_t006a,
+        it_kna1 type table of ty_kna1,
+        wa_kna1 like line of it_kna1.
+
+DATA v_vbeln type char10.
+data v_field type char40.
+
+SELECT-OPTIONS s_vbeln FOR wa_vbrk-vbeln.
+
+
+
+SELECT * FROM zvbrk_1 INTO TABLE it_vbrk WHERE vbeln in s_vbeln.
+
+sort it_vbrp by vbeln posnr.
+
+
+write : / 'Doc No.',
+         20 'Payer',
+         30 'Date',
+         50 'NetValue'.
+
+ LOOP AT  it_vbrk into wa_vbrk.
+   write : / wa_vbrk-vbeln,
+          20 wa_vbrk-kunrg,
+          30 wa_vbrk-fkdat,
+          50 wa_vbrk-netwr LEFT-JUSTIFIED.
+   Hide wa_vbrk-vbeln.
+*   CLEAR wa_vbrk-vbeln.
+   ENDLOOP.
+
+   AT LINE-SELECTION.
+*     get cursor field v_field value v_vbeln.
+     write : / 'Item',
+             20 'Materaial No.',
+             45 'Quantity',
+             60 'Measure',
+             70 'Net Value'.
+
+SELECT * FROM zvbrp_1 INTO TABLE it_vbrp WHERE vbeln eq wa_vbrk-vbeln.
+
+Loop at it_vbrp into wa_vbrp.
+  write : / wa_vbrp-posnr,
+          20 wa_vbrp-matnr,
+          45 wa_vbrp-fkimg LEFT-JUSTIFIED,
+          60 wa_vbrp-vrkme,
+          70 wa_vbrp-netwr LEFT-JUSTIFIED.
+  endloop.
