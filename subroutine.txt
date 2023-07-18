@@ -1,0 +1,27 @@
+*&---------------------------------------------------------------------*
+*& Report ZSUBROUTINES_180496
+*&---------------------------------------------------------------------*
+*&
+*&---------------------------------------------------------------------*
+REPORT ZSUBROUTINES_180496.
+
+data : v_matnr type makt-matnr,
+      v_spras type makt-spras,
+      v_maktx type makt-maktx.
+
+v_matnr = '000000000000000011'.
+v_spras = 'E'.
+
+perform get_data using v_matnr v_spras changing v_maktx.
+*&---------------------------------------------------------------------*
+*& Form get_data
+*&---------------------------------------------------------------------*
+*& text
+*&---------------------------------------------------------------------*
+*& -->  p1        text
+*& <--  p2        text
+*&---------------------------------------------------------------------*
+FORM get_data using p_v_matnr p_v_spras changing p_v_maktx .
+  select single maktx from makt into p_v_maktx where matnr eq v_matnr and spras eq v_spras.
+
+ENDFORM.
