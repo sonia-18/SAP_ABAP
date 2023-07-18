@@ -1,0 +1,65 @@
+*&---------------------------------------------------------------------*
+*& Report ZCLASSWRK_PLANT_180496
+*&---------------------------------------------------------------------*
+*& program flow
+*& -------------------------
+*& step 1
+*& define data object to store plant data (mard-standard table)
+*& fields - matnr,werks,lgort
+*&
+*& step 2
+*& select option (werks)
+*&
+*& step 3
+*& data to internal table
+*&---------------------------------------------------------------------*
+REPORT ZCLASSWRK_PLANT_180496.
+
+types : begin of ty_mard,
+        matnr type mard-matnr,
+        werks type mard-werks,
+        lgort type mard-lgort,
+        end of ty_mard.
+
+Data : it_mard type standard table of ty_mard,
+       wa_mard like line of it_mard.
+*       it_zdanger type STANDARD TABLE OF zdanger_mat,
+*       wa_zdanger like line of it_zdanger.
+
+data : it_range type standard table of zdanger_s_range,
+        wa_range like line of it_range.
+
+
+types : begin of ty_sdrange,
+        sign type char1,
+        options type char2,
+        low type matnr,
+        high type matnr,
+      end of ty_sdrange.
+
+
+data : it_srange type STANDARD TABLE OF ty_sdrange,
+      wa_srange like line of it_srange,
+      it_drange TYPE STANDARD TABLE OF ty_sdrange,
+      wa_drange like line of it_drange.
+
+
+select-options s_werks for wa_mard-werks.
+
+select matnr werks lgort from mard into table it_mard where werks in s_werks.
+  select * from zdanger_s_range into table it_range.
+    select sign options low high from zdanger_s_range into table it_srange.
+
+sort it_mard by matnr.
+
+write : / 'Material num',
+       20 'Plant Num' LEFT-JUSTIFIED,
+       40 'Storage Location' LEFT-JUSTIFIED.
+skip.
+*sort zdanger_s_range by sl_no.
+loop at it_mard into wa_mard.
+
+  write : / wa_mard-matnr,
+          20 wa_mard-werks left-justified,
+           40 wa_mard-lgort left-JUSTIFIED.
+  endloop.
