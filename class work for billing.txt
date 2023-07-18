@@ -1,0 +1,85 @@
+*&---------------------------------------------------------------------*
+*& Report ZBILLING_CLASSWRK_180496
+*&---------------------------------------------------------------------*
+*&
+*&---------------------------------------------------------------------*
+REPORT zbilling_classwrk_180496.
+
+* ty_makt line type (structure) and ty_t_makt table type (internal table)
+
+*step 1
+DATA : it_vbrk TYPE STANDARD TABLE OF zvbrk_1,
+       wa_vbrk LIKE LINE OF it_vbrk,
+       it_vbrp TYPE STANDARD TABLE OF zvbrp_1,
+       wa_vbrp LIKE LINE OF it_vbrp.
+
+* declaring data type for payer name and abbr / internal table
+    types : begin of ty_t006a,
+             msehi type t006-msehi,
+             mseht type t006a-mseht,
+             end of ty_t006a.
+
+   types : begin of ty_kna1,
+           kunnr type kna1-kunnr,
+           name1 type kna1-name1,
+           end of ty_kna1.
+
+
+ data : it_t006a type table of ty_t006a,
+        wa_t006a like line of it_t006a,
+        it_kna1 type table of ty_kna1,
+        wa_kna1 like line of it_kna1.
+
+*step 2
+SELECT-OPTIONS s_vbeln FOR wa_vbrk-vbeln.
+
+*step 3
+SELECT * FROM zvbrk_1 INTO TABLE it_vbrk WHERE vbeln in s_vbeln.
+SELECT * FROM zvbrp_1 INTO TABLE it_vbrp WHERE vbeln in s_vbeln."[] also we can use no pblm
+*select msehi mseht from t006a into table it_t006a where msehi eq wa_vbrp-vrkme and spras eq sy-langu.
+*select kunnr name1 from kna1 into table it_kna1 where kunnr eq wa_vbrk-kunrg and spras eq sy-langu.
+  select msehi mseht from t006a into table it_t006a where spras eq sy-langu.
+  select kunnr name1 from kna1 into table it_kna1 where spras eq sy-langu.
+
+*  step 4
+sort it_vbrp by vbeln posnr.
+LOOP AT it_vbrp INTO wa_vbrp.
+  READ TABLE it_vbrk INTO wa_vbrk WITH KEY vbeln = wa_vbrp-vbeln.
+  read table it_t006a into wa_t006a with key msehi = wa_vbrp-vrkme.
+  read table it_kna1 into wa_kna1 with key kunnr = wa_vbrk-kunrg.
+
+at new vbeln.
+  WRITE : / 'Doc no : ',wa_vbrk-vbeln,
+          /,
+          / 'payer : ',wa_vbrk-kunrg,
+          /,
+          /'payer name : ',wa_kna1-name1,
+          /,
+          / 'Date : ', wa_vbrk-fkdat,
+          /,
+          / 'Netvalue : ',wa_vbrk-netwr left-justified,
+          /,
+          /'Item',
+           20 'Material Num',
+           40 'Qty',
+           50 'Measure',
+           70 'Abbr',
+           90 'Net Value',
+           / .
+
+ endat.
+  WRITE : / wa_vbrp-posnr,
+           20 wa_vbrp-matnr,
+           40 wa_vbrp-fkimg LEFT-JUSTIFIED,
+           50 wa_vbrp-vrkme,
+           70 wa_t006a-mseht left-justified,
+           90 wa_vbrp-netwr LEFT-JUSTIFIED.
+  write /.
+  skip.
+  at end of vbeln.
+    sum.
+    write :/ 'Total : ',wa_vbrp-fkimg.
+      endat.
+  clear : wa_vbrk,wa_vbrp.
+  write /.
+ENDLOOP.
