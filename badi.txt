@@ -1,0 +1,19 @@
+*&---------------------------------------------------------------------*
+*& Report ZBADI_EN_180496_NEW
+*&---------------------------------------------------------------------*
+*&
+*&---------------------------------------------------------------------*
+REPORT ZBADI_EN_180496_NEW.
+
+
+data o_badi type ref to zson_en_badi.
+
+PARAMETERS v_werks type werks_d.
+
+get badi o_badi
+filters
+zson_filter = v_werks.
+
+call badi o_badi->check_plant_data.
+
+write 'end'.
